@@ -25,6 +25,7 @@
  *
  *
  */
+#include <string.h>
 #include "common.h"
 
 
@@ -243,7 +244,7 @@ extract_archive(const char *filename, bool verbose, int flags) {
 
     archive_read_close(a);
     archive_read_free(a);
-    exit(0);
+    /*exit(0);*/
 }
 
 int main(int argc, char **argv) {
@@ -252,7 +253,7 @@ int main(int argc, char **argv) {
     mfu_init();
 
     MPI_Comm_rank(MPI_COMM_WORLD, &DTAR_rank);
-    MPI_Comm_rank(MPI_COMM_WORLD, &DTAR_size);
+    MPI_Comm_size(MPI_COMM_WORLD, &DTAR_size);
 
 
     GError *error = NULL;
@@ -332,7 +333,7 @@ int main(int argc, char **argv) {
 
     /* free context */
     g_option_context_free(context);
-
+    MFU_LOG(MFU_LOG_ERR, "Rank %d before epilogue\n", DTAR_rank);
     DTAR_epilogue();
     DTAR_exit(EXIT_SUCCESS);
     return 0;

@@ -1029,7 +1029,7 @@ void mfu_flist_stat(
         /* check whether we should skip this item */
         if (skip_fn != NULL && skip_fn(name, skip_args)) {
             /* skip this file, don't include it in new list */
-            MFU_LOG(MFU_LOG_INFO, "skip %s");
+            MFU_LOG(MFU_LOG_INFO, "skip %s",name);
             continue;
         }
 

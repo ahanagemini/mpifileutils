@@ -48,7 +48,7 @@
 #include <libcircle.h>
 #include <archive.h>
 #include <archive_entry.h>
-
+#include <string.h>
 #include "mfu.h"
 
 
