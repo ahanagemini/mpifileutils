@@ -859,6 +859,11 @@ void mfu_flist_walk_path(const char* dirpath, int use_stat, int dir_permissions,
 }
 
 /* Set up and execute directory walk */
+/*The use_stat variable can have 4 values as follows:
+	0 if we do not use stat and perform the summary at the end
+	1 if we use stat and perform the summary at the end
+	2 if we do not use stat and do not perform summary at the end
+	3 if we use stat and do not perform summary at the end*/ 
 void mfu_flist_walk_paths(uint64_t num_paths, const char** paths, int use_stat, int dir_permissions, mfu_flist bflist)
 {
     /* report walk count, time, and rate */
@@ -916,7 +921,7 @@ void mfu_flist_walk_paths(uint64_t num_paths, const char** paths, int use_stat, 
     /* we lookup users and groups first in case we can use
      * them to filter the walk */
     flist->detail = 0;
-    if (use_stat) {
+    if (use_stat==1 || use_stat==3) {
         flist->detail = 1;
         if (flist->have_users == 0) {
             mfu_flist_usrgrp_get_users(flist);
@@ -927,7 +932,7 @@ void mfu_flist_walk_paths(uint64_t num_paths, const char** paths, int use_stat, 
     }
 
     /* register callbacks */
-    if (use_stat) {
+    if (use_stat==1 || use_stat==3) {
         /* walk directories by calling stat on every item */
         CIRCLE_cb_create(&walk_stat_create);
         CIRCLE_cb_process(&walk_stat_process);
@@ -953,7 +958,8 @@ void mfu_flist_walk_paths(uint64_t num_paths, const char** paths, int use_stat, 
     CIRCLE_finalize();
 
     /* compute global summary */
-    mfu_flist_summarize(bflist);
+   if(use_stat==0 || use_stat==1) 
+        mfu_flist_summarize(bflist);
 
     double end_walk = MPI_Wtime();
 

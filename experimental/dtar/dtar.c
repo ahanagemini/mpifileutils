@@ -30,6 +30,7 @@
 
 
 static gboolean opts_create = FALSE;
+static gboolean opts_compress = FALSE;
 static gboolean opts_verbose = FALSE;
 static gboolean opts_debug = FALSE;
 static gboolean opts_extract = FALSE;
@@ -39,7 +40,8 @@ static gint     opts_chunksize = 1;
 
 static GOptionEntry entries[] = {
         {"create", 'c', 0, G_OPTION_ARG_NONE, &opts_create, "Create archive", NULL  },
-        {"extract", 'x', 0, G_OPTION_ARG_NONE, &opts_extract, "Extract archive", NULL },
+        {"compress", 'j', 0, G_OPTION_ARG_NONE, &opts_compress, "Compress archive", NULL },
+	{"extract", 'x', 0, G_OPTION_ARG_NONE, &opts_extract, "Extract archive", NULL },
         {"verbose", 'v', 0, G_OPTION_ARG_NONE, &opts_verbose, "Verbose output", NULL },
         {"debug", 'd', 0, G_OPTION_ARG_NONE, &opts_debug, "Debug output", NULL},
         {"preserve", 'p', 0, G_OPTION_ARG_NONE, &opts_preserve, "Preserve attributes", NULL},
@@ -96,12 +98,13 @@ static void update_offsets() {
 static void create_archive(char *filename) {
 
     DTAR_writer_init();
-
+    char** paths=(char**)malloc(sizeof(char*)*num_src_params);
     /* walk path to get stats info on all files */
     DTAR_flist = mfu_flist_new();
     for (int i = 0; i < num_src_params; i++) {
-        mfu_flist_walk_path(src_params[i].path, 1, 0, DTAR_flist);
-    }
+       paths[i]=src_params[i].path;
+    } 
+	mfu_flist_walk_paths(num_src_params,paths, 3, 0, DTAR_flist);
 
     DTAR_count = mfu_flist_size(DTAR_flist);
 
@@ -314,10 +317,19 @@ int main(int argc, char **argv) {
 
     time(&(DTAR_statistics.time_started));
     DTAR_statistics.wtime_started = MPI_Wtime();
-
-    if (opts_create) {
+    if (opts_compress && opts_create) {
+    	DTAR_parse_path_args(argc, argv, opts_tarfile);
+	create_archive( opts_tarfile);
+	/*compress(opts_tarfile);*/
+    }
+    else if (opts_create) {
         DTAR_parse_path_args(argc, argv, opts_tarfile);
         create_archive( opts_tarfile );
+    } 
+    else if (opts_extract && opts_compress)
+    {
+      	/*decompress(opts_tarfile);*/
+	extract_archive(opts_tarfile, opts_verbose, DTAR_user_opts.flags); 
     } else if (opts_extract) {
         extract_archive(opts_tarfile, opts_verbose, DTAR_user_opts.flags);
     } else {
