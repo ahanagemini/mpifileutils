@@ -7,9 +7,10 @@ if (DEFINED ENV{FILEUTILS_EXT})
     message("-- Using $ENV{FILEUTILS_EXT}")
     set(ENV{PKG_CONFIG_PATH} "$ENV{FILEUTILS_EXT}/lib/pkgconfig" )
 endif()
+
 set(CMAKE_C_FLAGS_DEBUG         "-Wall -O0 -g")
 set(CMAKE_C_FLAGS_RELEASE       "-Wall -Werror -O3")
-set(ENV{PKG_CONFIG_PATH} "/opt/dtcmp/lib/pkgconfig/")
+
 
 find_package(PkgConfig)
 find_package(MPI REQUIRED)

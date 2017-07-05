@@ -8,10 +8,10 @@ pkg_check_modules(GLIB2 REQUIRED glib-2.0)
 add_definitions(${GLIB2_CFLAGS})
 link_libraries(${GLIB2_LDFLAGS})
 
-link_libraries(${DTCMP_LDFLAGS})
 pkg_check_modules(ARCHIVE REQUIRED libarchive)
 add_definitions(${ARCHIVE_CFLAGS})
 link_libraries(${ARCHIVE_LDFLAGS})
+
 set(dtar_src_files common.c handle_args.c dtar.c)
 
 add_executable(dtar ${dtar_src_files})
